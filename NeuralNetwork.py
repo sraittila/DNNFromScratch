@@ -1,12 +1,14 @@
 import numpy as np
-
+#Implements neural network forward propagation
 class NeuralNetwork:
 
     def __init__(self, layerSizeArray, activationArray):
-        self.layerSizeArray = layerSizeArray
-        self.activationArray = activationArray
-        self.network = self.createNetwork()
+        self.layerSizeArray = layerSizeArray #size of input, size of each layer, size of output
+        self.activationArray = activationArray #actiovation function for every layer including the last. 
+                                                #Assumes that input doesnt have activation
+        self.network = self.createNetwork()   #initialize network weights
     
+    #initializes network with random weights
     def createNetwork(self):
         network = []
         for i in range(1,len(self.layerSizeArray)):
@@ -17,12 +19,13 @@ class NeuralNetwork:
 
         return network
     
+    #sigmoid activation function
     def sigmoid(self,x):
         return 1.0/(1.0 + np.exp(-x))
     
+    #sets weights from a textfile.
+    #It is assumed that text file is written as transpose of weight matrix
     def setWeightsFromFile(self, filename, layer):
-        print(filename)
-        
         file = open(filename, "r")
         i = 0
         for row in file:
@@ -35,11 +38,10 @@ class NeuralNetwork:
 
             i += 1
         
-        #print(self.network[layer-1][0])
-        
-    
+            
+    #sets bias from a textfile
+    #bias is assumed to be written as a column vector
     def setBiasFromFile(self, filename, layer):
-        print(filename)
         
         file = open(filename, "r")
         i = 0
@@ -49,9 +51,9 @@ class NeuralNetwork:
                 
             i += 1
         
-        #print(self.network[layer-1][1])
 
-
+    #forward propagates through network
+    #returns the output vector
     def forwardPropagate(self,xinput):
         a = xinput
         for layer in self.network:
