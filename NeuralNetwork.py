@@ -67,8 +67,21 @@ class NeuralNetwork:
                 a = z
         
         return a
+    
+    def __str__(self):
+        dimensionText = ""
+        for i in range(len(self.layerSizeArray)):
+            if i == 0:
+                dimensionText = "Input dimensions: " + str(self.layerSizeArray[0])+ "x1\n"
+                continue
+            #if i == len(self.layerSizeArray())
+            dimensionText += ("Weight matrix " + str(i) + " dimensions: " + str(self.layerSizeArray[i]) + "x" + str(self.layerSizeArray[i-1]) +  "\n")
+            #dimensionText += self.network[i-1][0].__str__() + "\n"
+            dimensionText += "Activation: " + self.activationArray[i-1] + "\n"
+            if i == len(self.layerSizeArray)-1:
+                dimensionText += "Output dimensions: " + str(self.layerSizeArray[i])+ "x1\n"
 
-   
+        return dimensionText
 
 
 
