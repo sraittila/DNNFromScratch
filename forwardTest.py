@@ -34,7 +34,9 @@ for x in x_train_flat:
     #x is a row vector and needs to be transposed
     xtransp = np.transpose(np.array([x]))
     #output is 10x1 vector
-    out = nn.forwardPropagate(xtransp)
+    outputlist = nn.forwardPropagate(xtransp)
+    #print(outputlist)
+    out = outputlist[-1][1]
     #argmax returns the index which has the highest value
     value = np.argmax(out)
     if value == y_train[i]:
