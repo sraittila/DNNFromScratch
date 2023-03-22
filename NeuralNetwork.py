@@ -23,11 +23,13 @@ class NeuralNetwork:
     def sigmoid(self,x):
         return 1.0/(1.0 + np.exp(-x))
     
+    #derivative of sigmoid
     def sigmoidDer(self,x):
         return self.sigmoid(x)*(1-self.sigmoid(x))
     
     #sets weights from a textfile.
     #It is assumed that text file is written as transpose of weight matrix
+    #because it is the format of Tensorflow
     def setWeightsFromFile(self, filename, layer):
         file = open(filename, "r")
         i = 0
@@ -81,43 +83,40 @@ class NeuralNetwork:
         
         #index of current layer, starting from top
         i=len(self.network)
-        #print(i)
+        #creates an empty array to store gradients
         gradients = [0]*i
-        deltas = [0]*i
-        #print(gradients)
+        
         #the output of whole network
         yEstimate=outputlist[i][1]
-        #print("yestimate")
-        #print(yEstimate)
-        #gL is the g-term for the output layer
-        dJdy = np.transpose(yEstimate-yTraining)
-        #print(dJdy)
-        dadz = self.diagDerivativeMatrix(self.network[i-1][2],outputlist[i][0])
-        #print(dadz)
-        gL = np.matmul(dJdy,dadz)
         
+        #gL is the g-term of the output layer
+        dJdy = np.transpose(yEstimate-yTraining)
+        dadz = self.diagDerivativeMatrix(self.network[i-1][2],outputlist[i][0])
+        gL = np.matmul(dJdy,dadz)
 
+        #weight and bias gradients of the output layer
         gtransp = np.transpose(gL)
-        weightGrad = np.matmul(gtransp,np.transpose(outputlist[i-1][1]))
+        weightGrad = np.matmul(gtransp,np.transpose(outputlist[i-1][1])) #g(l)*a(l-1)
         biasGrad = gtransp
         
+        #stores gradients of output layer at the last index
         gradients[i-1] = [weightGrad,biasGrad]
-        deltas[i-1] = gL
         
-        
+        #loops through the rest of the network and calculates gradients for each layer
         i -= 1
         g=gL
-        #print(outputlist[i][1])
-        #print(self.network[i][0])
+        
         while i > 0:
+            #g(l+1)*W(l+1)
             middle = np.matmul(g,self.network[i][0])
+            #diag(derActivation(z(l)))
             diag = self.diagDerivativeMatrix(self.network[i-1][2],outputlist[i][0])
             g=np.matmul(middle,diag)
             gtransp = np.transpose(g)
-            weightGrad = np.matmul(gtransp,np.transpose(outputlist[i-1][1]))
+            weightGrad = np.matmul(gtransp,np.transpose(outputlist[i-1][1])) #g(l)*a(l-1)
             biasGrad = gtransp
             gradients[i-1] = [weightGrad,biasGrad]
-            deltas[i-1] = g
+    
             i -= 1
         
         return gradients
@@ -125,11 +124,8 @@ class NeuralNetwork:
     def stochasticGradDesc(self, xTraining, yTraining, learningRate):
         gradients = self.backPropagate(xTraining,yTraining)
         for i in range(len(gradients)):
-            weightGrad = -1*learningRate*gradients[i][0]
-            #print(weightGrad)
-            biasGrad = -1*learningRate*gradients[i][1]
-            self.network[i][0] = np.add(self.network[i][0],weightGrad)
-            self.network[i][1] = np.add(self.network[i][1],biasGrad)
+            self.network[i][0] = np.add(self.network[i][0],-1*learningRate*gradients[i][0])
+            self.network[i][1] = np.add(self.network[i][1],-1*learningRate*gradients[i][1])
             
         
 
