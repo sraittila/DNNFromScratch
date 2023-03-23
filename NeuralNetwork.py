@@ -7,6 +7,7 @@ class NeuralNetwork:
         self.activationArray = activationArray #actiovation function for every layer including the last. 
                                                 #Assumes that input doesnt have activation
         self.network = self.createNetwork()   #initialize network weights
+        self.prevGradients = []
     
     #initializes network with random weights
     def createNetwork(self):
@@ -121,11 +122,30 @@ class NeuralNetwork:
         
         return gradients
     
-    def stochasticGradDesc(self, xTraining, yTraining, learningRate):
+    def stochasticGradDesc(self, xTraining, yTraining, learningRate, momentum):
         gradients = self.backPropagate(xTraining,yTraining)
-        for i in range(len(gradients)):
-            self.network[i][0] = np.add(self.network[i][0],-1*learningRate*gradients[i][0])
-            self.network[i][1] = np.add(self.network[i][1],-1*learningRate*gradients[i][1])
+
+        if len(self.prevGradients) == 0:
+            for i in range(len(gradients)):
+                self.prevGradients.append([0,0])
+            
+            for i in range(len(gradients)):
+                self.network[i][0] = np.add(self.network[i][0],-1*learningRate*gradients[i][0])
+                self.network[i][1] = np.add(self.network[i][1],-1*learningRate*gradients[i][1])
+                self.prevGradients[i][0] = gradients[i][0]
+                self.prevGradients[i][1] = gradients[i][1]
+        else:
+            for i in range(len(gradients)):
+                
+                gradWithMomentum = np.add(momentum*self.prevGradients[i][0] ,gradients[i][0])
+                biasGradWithMomentum = np.add(momentum*self.prevGradients[i][1] ,gradients[i][1])
+
+                self.network[i][0] = np.add(self.network[i][0],-1*learningRate*gradWithMomentum)
+                self.network[i][1] = np.add(self.network[i][1],-1*learningRate*biasGradWithMomentum)
+                self.prevGradients[i][0] = gradWithMomentum
+                self.prevGradients[i][1] = biasGradWithMomentum
+
+        
             
         
 

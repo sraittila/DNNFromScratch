@@ -40,7 +40,7 @@ class Mnist:
             xtransp = np.transpose(np.array([self.xtrain[i]]))
             yvector = np.zeros((10,1))
             yvector[self.ytrain[i]] = 1
-            self.nn.stochasticGradDesc(xtransp,yvector,0.1)
+            self.nn.stochasticGradDesc(xtransp,yvector,0.1,0.4)
             i += 1
         
     def calculateAccuracy(self,command):
